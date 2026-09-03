@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodE33p 个人主页</title>
+    <meta name="description" content="CodE33p 的个人博客 - 数位屏GN、游记、杂谈随笔">
+    <meta property="og:title" content="CodE33p 个人主页">
+    <meta property="og:description" content="数位屏GN、游记、杂谈随笔">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="pic/a.jpg">
+    <link rel="icon" href="pic/a.jpg">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, "SF Pro Display", "Helvetica Neue", sans-serif;
+        }
+
+        body {
+            background-image: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)), url("pic/bg.jpg");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        /* 顶部导航栏 毛玻璃 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 64px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            background-color: rgba(255,255,255,0.12);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 100;
+        }
+        .nav-back {
+            color:#fff;
+            font-size:16px;
+            font-weight:500;
+            cursor:pointer;
+            background:none;
+            border:none;
+            padding:0;
+        }
+        .nav-title {
+            color:#fff;
+            font-size:17px;
+            font-weight:600;
+        }
+
+        /* 汉堡菜单按钮 */
+        .hamburger {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+            padding: 4px;
+            background: none;
+            border: none;
+        }
+        .hamburger span {
+            width: 100%;
+            height: 3px;
+            background: #fff;
+            border-radius: 2px;
+        }
+
+        /* 焦点可见（键盘可达性） */
+        :focus-visible {
+            outline: 2px solid rgba(255,255,255,0.85);
+            outline-offset: 2px;
+        }
+        .side-drawer a:focus-visible {
+            outline: none;
+            background: #f3f3f3;
+        }
+
+        /* 页面容器 */
+        .page-container {
+            padding-top: 80px;
+        }
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        .page.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity:0; }
+            to { opacity:1; }
+        }
+
+        /* 首页 Hero */
+        .hero {
+            min-height: calc(100vh - 80px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding:20px;
+        }
+        .avatar-large {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+            border: 4px solid rgba(255,255,255,0.7);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .avatar-large:hover {
+            transform: scale(1.06);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+        }
+        .hero-title {
+            margin-top: 28px;
+            font-size: 38px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+        }
+        .hero-subtitle {
+            margin-top: 8px;
+            font-size: 20px;
+            font-weight: 300;
+            color: rgba(255,255,255,0.85);
+            letter-spacing: 3px;
+            text-shadow: 0 1px 8px rgba(0,0,0,0.3);
+        }
+        .btn-group {
+            margin-top: 44px;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .apple-btn {
+            display: inline-block;
+            padding: 12px 32px;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 980px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            border: none;
+            letter-spacing: 0.5px;
+            font-family: inherit;
+        }
+        .apple-btn.primary {
+            background-color: #0071e3;
+            color: #fff;
+        }
+        .apple-btn.primary:hover {
+            background-color: #0077ed;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,113,227,0.4);
+        }
+        .apple-btn.secondary {
+            background-color: transparent;
+            color: #fff;
+            border: 1.5px solid rgba(255,255,255,0.7);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        .apple-btn.secondary:hover {
+            background-color: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255,255,255,0.15);
+        }
+
+        /* 子页面通用内容样式 */
+        .sub-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        .page-title {
+            font-size:36px;
+            font-weight:700;
+            margin-bottom:12px;
+            text-shadow:0 2px 12px rgba(0,0,0,0.4);
+        }
+        .page-desc {
+            font-size:16px;
+            color:rgba(255,255,255,0.8);
+            margin-bottom:36px;
+            line-height:1.7;
+        }
+
+        /* 文章卡片（可展开/收起） */
+        .post {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .post-title {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #000;
+        }
+        .post-body {
+            font-size: 15px;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.85);
+            overflow: hidden;
+            max-height: 5.4em;  /* 默认 3 行预览（3 × 1.8 = 5.4em） */
+            transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .post.expanded .post-body {
+            max-height: none;  /* 动画结束后 JS 释放 inline max-height，由这条接管 */
+        }
+        .post:not(.expanded) .post-body > * {
+            margin: 0;
+        }
+        /* 折叠时隐藏图片/视频/代码块，避免撑破 3 行预览 */
+        .post:not(.expanded) .post-body img,
+        .post:not(.expanded) .post-body video,
+        .post:not(.expanded) .post-body pre {
+            display: none;
+        }
+        .post.expanded .post-body p {
+            margin-bottom: 12px;
+        }
+        .post.expanded .post-body > *:last-child {
+            margin-bottom: 0;
+        }
+        .post.expanded .post-body h2 {
+            font-size: 19px;
+            margin: 18px 0 10px;
+            color: #fff;
+        }
+        .post.expanded .post-body h2:first-child { margin-top: 0; }
+        .post.expanded .post-body h3 {
+            font-size: 16px;
+            margin: 14px 0 8px;
+            color: #fff;
+        }
+        .post.expanded .post-body ul,
+        .post.expanded .post-body ol {
+            margin: 0 0 12px;
+            padding-left: 24px;
+        }
+        .post.expanded .post-body li { margin: 4px 0; }
+        .post.expanded .post-body a {
+            color: #4db5ff;
+            text-decoration: underline;
+        }
+        .post.expanded .post-body code {
+            background: rgba(0,0,0,0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: ui-monospace, "SF Mono", Menlo, monospace;
+            font-size: 13px;
+        }
+        .post.expanded .post-body pre {
+            background: rgba(0,0,0,0.35);
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 0 0 12px;
+        }
+        .post.expanded .post-body pre code {
+            background: none;
+            padding: 0;
+        }
+        .post.expanded .post-body blockquote {
+            border-left: 3px solid rgba(255,255,255,0.4);
+            padding-left: 12px;
+            margin: 0 0 12px;
+            color: rgba(255,255,255,0.7);
+        }
+        .post.expanded .post-body img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 8px 0;
+        }
+        .post-toggle {
+            margin-top: 14px;
+            background: none;
+            border: none;
+            color: #0071e3;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+        }
+        .post-toggle:hover {
+            text-decoration: underline;
+        }
+        .post-toggle .triangle {
+            display: inline-block;
+            transition: transform 0.3s ease;
+            font-size: 10px;
+        }
+        .post.expanded .post-toggle .triangle {
+            transform: rotate(90deg);
+        }
+
+        /* 头像弹窗 */
+        .avatar-modal-mask {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0,0,0,0.55);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.32s ease;
+        }
+        .avatar-modal-mask.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .avatar-modal {
+            background: #fff;
+            width: 90%;
+            max-width: 420px;
+            border-radius: 14px;
+            padding: 22px;
+            transform: scale(0.82);
+            transition: transform 0.32s ease;
+        }
+        .avatar-modal-mask.active .avatar-modal {
+            transform: scale(1);
+        }
+        .bili-screenshot {
+            width: 100%;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-bottom: 16px;
+        }
+        .modal-close {
+            float: right;
+            cursor: pointer;
+            font-size: 22px;
+            color: #666;
+            line-height: 1;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        .modal-item {
+            margin: 10px 0;
+            font-size: 15px;
+            color: #333;
+        }
+        .modal-item a {
+            color: #0071e3;
+            text-decoration: none;
+        }
+        .modal-item a:hover {
+            text-decoration: underline;
+        }
+
+        /* 侧边滑出菜单 */
+        .side-mask {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 150;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .side-mask.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .side-drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 260px;
+            height: 100vh;
+            background: #ffffff;
+            transform: translateX(100%);
+            transition: transform 0.34s ease;
+            z-index: 151;
+            padding-top: 80px;
+            overflow-y: auto;
+        }
+        .side-drawer.active {
+            transform: translateX(0);
+        }
+        .side-drawer a {
+            display: block;
+            padding: 14px 24px;
+            color: #222;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        .side-drawer a:hover {
+            background: #f3f3f3;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 32px; }
+            .btn-group { gap: 12px; }
+        }
+        @media (max-width: 480px) {
+            .avatar-large { width: 120px; height: 120px; }
+            .hero-title { font-size: 28px; }
+            .hero-subtitle { font-size: 16px; }
+            .btn-group { flex-direction: column; width: 80%; }
+            .apple-btn { text-align: center; }
+            .page-title { font-size: 28px; }
+        }
+
+        /* 减少动画偏好 */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <button class="nav-back" id="goHomeBtn" type="button" aria-label="返回首页" hidden>← 返回</button>
+        <span class="nav-title" id="navPageTitle"></span>
+        <button class="hamburger" id="menuBtn" type="button" aria-label="打开/关闭菜单" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <div class="page-container">
+        <!-- 首页 -->
+        <div class="page active" id="page-home">
+            <section class="hero">
+                <img class="avatar-large" src="pic/a.jpg" alt="头像" id="avatarBtn">
+                <h1 class="hero-title">Code33 / 数位屏</h1>
+                <p class="hero-subtitle">Welcome</p>
+                <div class="btn-group">
+                    <button class="apple-btn primary" type="button" data-target="page-gn">数位屏GN</button>
+                    <button class="apple-btn secondary" type="button" data-target="page-travel">游记</button>
+                    <button class="apple-btn secondary" type="button" data-target="page-essay">杂谈/随笔</button>
+                </div>
+            </section>
+        </div>
+
+        <!-- 数位屏GN -->
+        <div class="page" id="page-gn">
+            <div class="sub-content">
+                <h1 class="page-title">数位屏GN</h1>
+                <p class="page-desc">参考IGN测评的形式，基于本人的主观体验给出的十分制评测。<br>
+                    纯主观感受可能会受到环境等因素的干扰，或许不能完全反映出评测对象的真实情况，但确实是本人真实体验与感受。
+</p>
+                <div class="post-list" data-page="page-gn"></div>
+            </div>
+        </div>
+
+        <!-- 游记 -->
+        <div class="page" id="page-travel">
+            <div class="sub-content">
+                <h1 class="page-title">游记</h1>
+                <p class="page-desc">读万卷书，行万里路。<br>记录走过的地方。</p>
+                <div class="post-list" data-page="page-travel"></div>
+            </div>
+        </div>
+
+        <!-- 杂谈随笔 -->
+        <div class="page" id="page-essay">
+            <div class="sub-content">
+                <h1 class="page-title">杂谈/随笔</h1>
+                <p class="page-desc">日常碎碎念，梦到啥说啥</p>
+                <div class="post-list" data-page="page-essay"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 头像弹窗 -->
+    <div class="avatar-modal-mask" id="avatarMask" role="dialog" aria-modal="true" aria-label="B站主页信息">
+        <div class="avatar-modal">
+            <button class="modal-close" id="closeAvatarModal" type="button" aria-label="关闭">&times;</button>
+            <br>
+            <img class="bili-screenshot" src="pic/bili.jpg" alt="b站主页截图" loading="lazy">
+            <div class="modal-item">
+                <a href="https://b23.tv/BI9fIRk" target="_blank" rel="noopener noreferrer">点此处跳转b站主页</a>
+            </div>
+            <div class="modal-item">QQ：2175542640</div>
+        </div>
+    </div>
+
+    <!-- 侧边菜单 -->
+    <div class="side-mask" id="sideMask"></div>
+    <aside class="side-drawer" id="sideDrawer" aria-label="站点导航">
+        <a href="#" data-target="page-home">首页</a>
+        <a href="#" data-target="page-gn">数位屏GN</a>
+        <a href="#" data-target="page-travel">游记</a>
+        <a href="#" data-target="page-essay">杂谈/随笔</a>
+    </aside>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="posts.js"></script>
+    <script>
+        // === 渲染文章列表（数据来自 posts.js） ===
+        // content 支持 Markdown：marked.js 加载成功就用 Markdown，离线时降级为纯文本分段
+        function renderContent(content){
+            if(typeof marked !== 'undefined'){
+                try {
+                    return marked.parse(content, { breaks: true });
+                } catch(e) {
+                    return content.split('\n\n').map(p=>`<p>${p}</p>`).join('');
+                }
+            }
+            return content.split('\n\n').map(p=>`<p>${p}</p>`).join('');
+        }
+
+        function renderPosts(){
+            if(typeof POSTS === 'undefined') return;
+            Object.entries(POSTS).forEach(([pageId, posts])=>{
+                const container = document.querySelector(`[data-page="${pageId}"]`);
+                if(!container) return;
+                container.innerHTML = posts.map(post=>`
+                    <article class="post">
+                        <h3 class="post-title">${post.title}</h3>
+                        <div class="post-body">
+                            ${renderContent(post.content)}
+                        </div>
+                        <button class="post-toggle" type="button" aria-expanded="false">
+                            <span class="triangle">▶</span>
+                            <span class="toggle-text">展开</span>
+                        </button>
+                    </article>
+                `).join('');
+            });
+            // 绑定展开/收起（带高度过渡动画）
+            document.querySelectorAll('.post-toggle').forEach(btn=>{
+                btn.addEventListener('click', ()=>{
+                    const post = btn.closest('.post');
+                    const body = post.querySelector('.post-body');
+                    const willExpand = !post.classList.contains('expanded');
+
+                    if(willExpand){
+                        // 展开：从当前高度动画到内容真实高度
+                        const startHeight = body.offsetHeight;
+                        const targetHeight = body.scrollHeight;
+                        body.style.transition = 'none';
+                        body.style.maxHeight = startHeight + 'px';
+                        body.offsetHeight;  // 强制重排，让起点生效
+                        body.style.transition = '';
+                        post.classList.add('expanded');
+                        requestAnimationFrame(()=>{
+                            body.style.maxHeight = targetHeight + 'px';
+                        });
+                    } else {
+                        // 收起：从当前高度动画回 3 行高度
+                        const startHeight = body.offsetHeight;
+                        const targetHeight = 5.4 * parseFloat(getComputedStyle(body).fontSize);
+                        body.style.transition = 'none';
+                        body.style.maxHeight = startHeight + 'px';
+                        body.offsetHeight;  // 强制重排，让起点生效
+                        body.style.transition = '';
+                        post.classList.remove('expanded');
+                        requestAnimationFrame(()=>{
+                            body.style.maxHeight = targetHeight + 'px';
+                        });
+                    }
+
+                    // 动画结束后清理 inline max-height，交给 CSS 接管
+                    const cleanup = ()=>{
+                        body.style.maxHeight = '';
+                        body.removeEventListener('transitionend', cleanup);
+                    };
+                    body.addEventListener('transitionend', cleanup);
+                    setTimeout(cleanup, 600);  // 兜底：万一 transitionend 没触发
+
+                    btn.setAttribute('aria-expanded', willExpand ? 'true' : 'false');
+                    btn.querySelector('.toggle-text').textContent = willExpand ? '收起' : '展开';
+                });
+            });
+        }
+
+        // === 页面切换 ===
+        const pages = document.querySelectorAll('.page');
+        const navPageTitle = document.getElementById('navPageTitle');
+        const goHomeBtn = document.getElementById('goHomeBtn');
+        const pageTitleMap = {
+            "page-home":"",
+            "page-gn":"数位屏GN",
+            "page-travel":"游记",
+            "page-essay":"杂谈/随笔"
+        };
+        let currentPageId = 'page-home';
+
+        function switchPage(targetId){
+            if(!targetId || targetId === currentPageId) return;
+            currentPageId = targetId;
+            pages.forEach(p=>p.classList.remove('active'));
+            const target = document.getElementById(targetId);
+            if(target) target.classList.add('active');
+            navPageTitle.innerText = pageTitleMap[targetId] || "";
+            goHomeBtn.hidden = targetId === 'page-home';
+            closeSide();
+            window.scrollTo(0,0);
+        }
+
+        // 首页按钮跳转
+        document.querySelectorAll('.apple-btn[data-target]').forEach(btn=>{
+            btn.addEventListener('click', ()=>switchPage(btn.dataset.target));
+        });
+        // 侧边菜单跳转
+        document.querySelectorAll('.side-drawer a[data-target]').forEach(item=>{
+            item.addEventListener('click', e=>{
+                e.preventDefault();
+                switchPage(item.dataset.target);
+            });
+        });
+        // 返回首页按钮
+        goHomeBtn.addEventListener('click', ()=>switchPage('page-home'));
+
+        // === 头像弹窗（带焦点管理） ===
+        const avatarBtn = document.getElementById('avatarBtn');
+        const avatarMask = document.getElementById('avatarMask');
+        const closeAvatarModal = document.getElementById('closeAvatarModal');
+        let lastFocused = null;
+
+        function openAvatarModal(){
+            lastFocused = document.activeElement;
+            avatarMask.classList.add('active');
+            closeAvatarModal.focus();
+        }
+        function closeAvatarModalFn(){
+            avatarMask.classList.remove('active');
+            if(lastFocused) lastFocused.focus();
+        }
+        avatarBtn.addEventListener('click', openAvatarModal);
+        closeAvatarModal.addEventListener('click', closeAvatarModalFn);
+        avatarMask.addEventListener('click', e=>{
+            if(e.target === avatarMask) closeAvatarModalFn();
+        });
+
+        // === 侧边抽屉 ===
+        const menuBtn = document.getElementById('menuBtn');
+        const sideMask = document.getElementById('sideMask');
+        const sideDrawer = document.getElementById('sideDrawer');
+        function openSide(){
+            sideMask.classList.add('active');
+            sideDrawer.classList.add('active');
+            menuBtn.setAttribute('aria-expanded','true');
+        }
+        function closeSide(){
+            sideMask.classList.remove('active');
+            sideDrawer.classList.remove('active');
+            menuBtn.setAttribute('aria-expanded','false');
+        }
+        menuBtn.addEventListener('click', ()=>{
+            sideDrawer.classList.contains('active') ? closeSide() : openSide();
+        });
+        sideMask.addEventListener('click', closeSide);
+
+        // === ESC 关闭弹窗或抽屉 ===
+        document.addEventListener('keydown', e=>{
+            if(e.key === 'Escape'){
+                if(avatarMask.classList.contains('active')) closeAvatarModalFn();
+                else if(sideDrawer.classList.contains('active')) closeSide();
+            }
+        });
+
+        // === 初始化 ===
+        renderPosts();
+    </script>
+</body>
+</html>
