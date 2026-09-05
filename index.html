@@ -191,10 +191,17 @@
             padding: 24px;
         }
         .page-title {
-            font-size:36px;
+            font-size:40px;
             font-weight:700;
             margin-bottom:12px;
-            text-shadow:0 2px 12px rgba(0,0,0,0.4);
+            /* 白字 + 黑色细描边 */
+            -webkit-text-stroke: 0.4px rgba(0,0,0,0.6);
+            text-shadow:
+                -0.6px 0 0 rgba(0,0,0,0.6),
+                 0.6px 0 0 rgba(0,0,0,0.6),
+                0 -0.6px 0 rgba(0,0,0,0.6),
+                0  0.6px 0 rgba(0,0,0,0.6),
+                0 2px 12px rgba(0,0,0,0.4);
         }
         .page-desc {
             font-size:16px;
@@ -214,9 +221,17 @@
             border: 1px solid rgba(255,255,255,0.15);
         }
         .post-title {
-            font-size: 20px;
-            margin-bottom: 10px;
+            font-size: 28px;
+            line-height: 1.4;
+            margin-bottom: 12px;
             color: #000;
+            /* 黑字 + 白色细描边 */
+            -webkit-text-stroke: 0.5px rgba(255,255,255,0.9);
+            text-shadow:
+                -0.6px 0 0 rgba(255,255,255,0.85),
+                 0.6px 0 0 rgba(255,255,255,0.85),
+                0 -0.6px 0 rgba(255,255,255,0.85),
+                0  0.6px 0 rgba(255,255,255,0.85);
         }
         .post-body {
             font-size: 15px;
@@ -225,6 +240,12 @@
             overflow: hidden;
             max-height: 5.4em;  /* 默认 3 行预览（3 × 1.8 = 5.4em） */
             transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+            /* 正文白色文字 + 黑色细描边，任何背景上都清晰 */
+            text-shadow:
+                -0.4px 0 0 rgba(0,0,0,0.55),
+                 0.4px 0 0 rgba(0,0,0,0.55),
+                0 -0.4px 0 rgba(0,0,0,0.55),
+                0  0.4px 0 rgba(0,0,0,0.55);
         }
         .post.expanded .post-body {
             max-height: none;  /* 动画结束后 JS 释放 inline max-height，由这条接管 */
@@ -240,6 +261,21 @@
         }
         .post.expanded .post-body p {
             margin-bottom: 12px;
+        }
+        /* 正文段落首行缩进两格 */
+        .post-body p {
+            text-indent: 2em;
+        }
+        /* 手动关闭缩进：段首写 <-，或整篇文章设 indent:false */
+        .post-body p.no-indent,
+        .post-body.no-indent-all p {
+            text-indent: 0;
+        }
+        /* 图片独占的段落、列表/引用内的段落不缩进 */
+        .post-body p:has(img),
+        .post-body li p,
+        .post-body blockquote p {
+            text-indent: 0;
         }
         .post.expanded .post-body > *:last-child {
             margin-bottom: 0;
@@ -276,7 +312,9 @@
             background: rgba(0,0,0,0.35);
             padding: 12px;
             border-radius: 8px;
-            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow-wrap: anywhere;
             margin: 0 0 12px;
         }
         .post.expanded .post-body pre code {
@@ -289,10 +327,25 @@
             margin: 0 0 12px;
             color: rgba(255,255,255,0.7);
         }
-        .post.expanded .post-body img {
-            max-width: 100%;
+        /* 图片 + 图注（[] 里的文字显示在图片下方） */
+        .post-figure {
+            margin: 14px auto;
+            text-indent: 0;
+            text-align: center;
+        }
+        .post-figure img {
+            width: 100%;
+            height: auto;
             border-radius: 8px;
-            margin: 8px 0;
+            display: block;
+        }
+        .post-figure figcaption {
+            margin-top: 6px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.6);
+            text-align: center;
+            text-shadow: none;  /* 小字不继承正文描边，避免发糊 */
         }
         .post-toggle {
             margin-top: 14px;
@@ -427,11 +480,12 @@
         }
         @media (max-width: 480px) {
             .avatar-large { width: 120px; height: 120px; }
-            .hero-title { font-size: 28px; }
+            .hero-title { font-size: 30px; }
             .hero-subtitle { font-size: 16px; }
             .btn-group { flex-direction: column; width: 80%; }
             .apple-btn { text-align: center; }
-            .page-title { font-size: 28px; }
+            .page-title { font-size: 30px; }
+            .post-title { font-size: 23px; }
         }
 
         /* 减少动画偏好 */
@@ -524,15 +578,116 @@
     <script>
         // === 渲染文章列表（数据来自 posts.js） ===
         // content 支持 Markdown：marked.js 加载成功就用 Markdown，离线时降级为纯文本分段
+
+        // 预处理：去掉每行开头的缩进空格（行首缩进≥4格会被 Markdown 误判为代码块），
+        // 但 ~~~ / ``` 围栏代码块内部的内容保持原样
+        function preprocessMarkdown(md){
+            const lines = md.split('\n');
+            let inFence = false;
+            const out = lines.map(line => {
+                if (/^\s*(```|~~~)/.test(line)) {
+                    inFence = !inFence;
+                    return line.trim();
+                }
+                if (inFence) return line;
+                let l = line.replace(/^[ \t]+/, '');
+                l = transformBookTitles(l);
+                l = transformImages(l);
+                // 段首写 <- 表示该段不缩进（在段落开头插入哨兵注释，渲染后替换为 class）
+                l = l.replace(/^<-\s?/, '<!--NOINDENT-->');
+                return l;
+            });
+            return out.join('\n');
+        }
+
+        // 书名号《...》自动变斜体：
+        // 直接转成 <em> 标签，绕开 Markdown 强调符 * 在中文/书名号旁的配对规则
+        // （否则会出现 *《A》*与*《B》* 里"与"变斜体、书名号反而不斜的问题）
+        function transformBookTitles(text){
+            // 1) 已被 * 包裹的：*《...》* → <em>《...》</em>（书名号内部误写的 * 一并清掉）
+            let t = text.replace(/\*(《[^》\n]*》)\*/g, (m, g1) =>
+                '<em>' + g1.replace(/\*/g, '') + '</em>'
+            );
+            // 2) 剩余的《...》统一包 <em>，已包过的跳过
+            t = t.replace(/<em>《[^》\n]*》<\/em>|《[^》\n]*》/g, m =>
+                m.startsWith('<em>') ? m : `<em>${m.replace(/\*/g, '')}</em>`
+            );
+            return t;
+        }
+
+        // 图片尺寸语法（写在 markdown 图片地址后面）：
+        //   ![描述](pic/x.jpg)          默认，宽度撑满卡片
+        //   ![描述](pic/x.jpg =400)     宽度 400px
+        //   ![描述](pic/x.jpg =400x300) 宽 400px 高 300px
+        //   ![描述](pic/x.jpg =50%)     宽度占卡片 50%
+        function transformImages(text){
+            return text.replace(
+                /!\[([^\]]*)\]\(\s*([^)\s]+?)\s*(?:=\s*(\d+(?:\.\d+)?)(%)?(?:x(\d+))?)?\s*\)/g,
+                (m, alt, src, num, isPct, h) => {
+                    if(!num) return m;  // 没有尺寸参数，交给 Markdown 正常渲染
+                    const w = isPct ? num + '%' : num + 'px';
+                    const style = h
+                        ? `width:${w};height:${h}px;object-fit:contain;`
+                        : `width:${w};max-width:100%;height:auto;`;
+                    return `<img src="${src}" alt="${alt}" loading="lazy" style="${style}">`;
+                }
+            );
+        }
+
+        // 把所有 <img> 包成 <figure>，[ ] 里的文字作为图片下方注释（figcaption）
+        function wrapImagesWithCaption(html){
+            return html
+                .replace(/<img\b[^>]*>/g, imgTag => {
+                    const getAttr = name => {
+                        const m = imgTag.match(new RegExp('\\b' + name + '="([^"]*)"'));
+                        return m ? m[1] : '';
+                    };
+                    const alt = getAttr('alt');
+                    const style = getAttr('style');
+                    // width 类样式放到 figure 上；height/object-fit 留在 img 上
+                    let figStyle = '', imgStyleAttr = '';
+                    if(style){
+                        const props = style.split(';').map(s=>s.trim()).filter(Boolean);
+                        const figProps = [], imgProps = [];
+                        props.forEach(p=>{
+                            (/^(height|object-fit)/.test(p) ? imgProps : figProps).push(p);
+                        });
+                        if(figProps.length) figStyle = ` style="${figProps.join(';')}"`;
+                        if(imgProps.length) imgStyleAttr = ` style="${imgProps.join(';')}"`;
+                    }
+                    let innerImg = imgTag.replace(/\s*style="[^"]*"/, '');
+                    if(imgStyleAttr) innerImg = innerImg.replace(/>$/, imgStyleAttr + '>');
+                    const cap = alt.trim() ? `<figcaption>${alt}</figcaption>` : '';
+                    return `<figure class="post-figure"${figStyle}>${innerImg}${cap}</figure>`;
+                })
+                // 去掉 marked 给独占一行图片套的 <p> 外壳（figure 不能嵌在 p 里）
+                .replace(/<p>\s*(<figure\b[\s\S]*?<\/figure>)\s*<\/p>/g, '$1');
+        }
+
         function renderContent(content){
+            const md = preprocessMarkdown(content);
+            let html;
             if(typeof marked !== 'undefined'){
                 try {
-                    return marked.parse(content, { breaks: true });
+                    html = marked.parse(md, { breaks: true });
                 } catch(e) {
-                    return content.split('\n\n').map(p=>`<p>${p}</p>`).join('');
+                    html = md.split(/\n{2,}/).map(p=>`<p>${p}</p>`).join('');
                 }
+            } else {
+                html = md.split(/\n{2,}/).map(p=>`<p>${p}</p>`).join('');
             }
-            return content.split('\n\n').map(p=>`<p>${p}</p>`).join('');
+            html = wrapImagesWithCaption(html);
+            // 把不缩进哨兵替换成 class
+            return html.replace(/<!--NOINDENT-->\s*<p(?:\s[^>]*)?>/g, '<p class="no-indent">');
+        }
+
+        // 标题也走行内 Markdown（支持 ***加粗斜体*** 等），离线时去掉 * 号
+        function renderTitle(title){
+            const t = transformBookTitles(title || '');
+            if(typeof marked !== 'undefined'){
+                try { return marked.parseInline(t); } catch(e) {}
+            }
+            return t.replace(/\*+/g, '');
         }
 
         function renderPosts(){
@@ -540,10 +695,14 @@
             Object.entries(POSTS).forEach(([pageId, posts])=>{
                 const container = document.querySelector(`[data-page="${pageId}"]`);
                 if(!container) return;
-                container.innerHTML = posts.map(post=>`
+                // 过滤掉标题和正文都为空的占位文章
+                const validPosts = posts.filter(post =>
+                    (post.title && post.title.trim()) || (post.content && post.content.trim())
+                );
+                container.innerHTML = validPosts.map(post=>`
                     <article class="post">
-                        <h3 class="post-title">${post.title}</h3>
-                        <div class="post-body">
+                        <h3 class="post-title">${renderTitle(post.title)}</h3>
+                        <div class="post-body${post.indent === false ? ' no-indent-all' : ''}">
                             ${renderContent(post.content)}
                         </div>
                         <button class="post-toggle" type="button" aria-expanded="false">
