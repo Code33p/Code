@@ -474,9 +474,244 @@
         }
 
         /* 响应式 */
+        /* ============================================================
+           GPS 测速工具
+           全部选择器限定在 #page-gps 内，避免影响全站其他页面
+           ============================================================ */
+        #page-gps .gps-app {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 560px;
+            margin: 0 auto;
+            padding-bottom: 10px;
+            color: #f2f4f6;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                         "PingFang SC", "Microsoft YaHei", sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* 顶部 HTTPS 警告 */
+        #page-gps .gps-warn {
+            display: none;
+            background: #facc15;
+            color: #1a1400;
+            font-size: 13px;
+            font-weight: 800;
+            text-align: center;
+            padding: 8px 10px;
+            border-radius: 10px;
+            letter-spacing: .01em;
+        }
+
+        /* 速度区 */
+        #page-gps .speed-area { flex: 0 0 auto; }
+        #page-gps .speed-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            line-height: 1;
+            margin-bottom: 8px;
+            min-width: 0;
+        }
+        #page-gps .speed {
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+                         "Liberation Mono", "Courier New", monospace;
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "tnum";
+            font-size: clamp(58px, 20vw, 120px);
+            font-weight: 700;
+            line-height: 0.82;
+            letter-spacing: -0.045em;
+            color: #ffffff;
+            white-space: nowrap;
+        }
+        #page-gps .unit {
+            font-size: clamp(12px, 3.4vw, 18px);
+            font-weight: 700;
+            color: #8b949c;
+            letter-spacing: .06em;
+            padding-bottom: clamp(6px, 1.8vw, 14px);
+            white-space: nowrap;
+        }
+        #page-gps .sub {
+            font-size: 12px;
+            line-height: 1.55;
+            color: #98a2ab;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #page-gps .sub.row2 {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        #page-gps #acc.mid  { color: #facc15; font-weight: 700; }
+        #page-gps #acc.bad  { color: #ff4d4d; font-weight: 700; }
+
+        /* 曲线区 */
+        #page-gps .chart-wrap {
+            position: relative;
+            height: 220px;
+            min-height: 92px;
+            background: #0d0f11;
+            border: 1px solid #1b2024;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        #page-gps .chart-wrap canvas {
+            position: absolute;
+            inset: 0;
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 统计区 */
+        #page-gps .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        #page-gps .stat {
+            min-width: 0;
+            padding: 7px 9px;
+            background: #101317;
+            border: 1px solid #1a1f24;
+            border-radius: 12px;
+        }
+        #page-gps .stat.span2 { grid-column: span 2; }
+        #page-gps .stat .label,
+        #page-gps .stat .gps-label {
+            font-size: 10px;
+            color: #7b848d;
+            letter-spacing: .04em;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #page-gps .stat .value {
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+                         "Liberation Mono", "Courier New", monospace;
+            font-variant-numeric: tabular-nums;
+            font-size: 17px;
+            font-weight: 700;
+            line-height: 1.25;
+            color: #eaf0f4;
+            white-space: nowrap;
+        }
+        #page-gps .stat .value small {
+            font-size: 10px;
+            font-weight: 600;
+            color: #7b848d;
+            margin-left: 2px;
+        }
+        #page-gps .value.good { color: #00e5a0; }
+        #page-gps .value.mid  { color: #facc15; }
+        #page-gps .value.bad  { color: #ff4d4d; }
+
+        /* 状态行 */
+        #page-gps .gps-status {
+            min-height: 16px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: .02em;
+            color: #facc15;
+        }
+        #page-gps .gps-status.show { animation: gpsPulse 1.4s ease-in-out infinite; }
+        @keyframes gpsPulse {
+            0%, 100% { opacity: .45; }
+            50%      { opacity: 1; }
+        }
+
+        /* 主按钮 */
+        #page-gps .main-btn {
+            height: 64px;
+            min-height: 56px;
+            border: 0;
+            border-radius: 18px;
+            background: #00e5a0;
+            color: #04120c;
+            font-family: inherit;
+            font-size: 19px;
+            font-weight: 800;
+            letter-spacing: .04em;
+            cursor: pointer;
+            transition: transform .08s ease, background .2s ease, color .2s ease;
+        }
+        #page-gps .main-btn:active:not(:disabled) { transform: scale(.985); }
+        #page-gps .main-btn.recording { background: #ff3b3b; color: #ffffff; }
+        #page-gps .main-btn:disabled  { background: #20252a; color: #5d666e; cursor: default; }
+
+        /* 异常提示遮罩 */
+        #page-gps .gps-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 300;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 22px;
+            background: rgba(6, 6, 6, .93);
+            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
+        }
+        #page-gps .gps-overlay.show { display: flex; }
+        #page-gps .gps-card {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            background: #140c0c;
+            border: 1px solid #431a1a;
+            border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .6);
+        }
+        #page-gps .gps-card h2 {
+            margin: 0 0 12px;
+            font-size: 20px;
+            font-weight: 800;
+            color: #ff4d4d;
+            letter-spacing: .01em;
+        }
+        #page-gps .gps-card ul { margin: 0; padding-left: 18px; }
+        #page-gps .gps-card li {
+            font-size: 13.5px;
+            line-height: 1.75;
+            color: #e8e8e8;
+            margin-bottom: 6px;
+        }
+        #page-gps .gps-card p {
+            margin: 0 0 8px;
+            font-size: 13.5px;
+            line-height: 1.75;
+            color: #e8e8e8;
+        }
+        #page-gps .retry {
+            display: none;
+            width: 100%;
+            height: 48px;
+            margin-top: 14px;
+            border: 0;
+            border-radius: 12px;
+            background: #ff4d4d;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
         @media (max-width: 768px) {
             .hero-title { font-size: 32px; }
             .btn-group { gap: 12px; }
+            #page-gps .chart-wrap { height: 180px; }
         }
         @media (max-width: 480px) {
             .avatar-large { width: 120px; height: 120px; }
@@ -517,6 +752,7 @@
                     <button class="apple-btn primary" type="button" data-target="page-gn">数位屏GN</button>
                     <button class="apple-btn secondary" type="button" data-target="page-travel">游记</button>
                     <button class="apple-btn secondary" type="button" data-target="page-essay">杂谈/随笔</button>
+                    <button class="apple-btn secondary" type="button" data-target="page-gps">GPS测速</button>
                 </div>
             </section>
         </div>
@@ -549,6 +785,71 @@
                 <div class="post-list" data-page="page-essay"></div>
             </div>
         </div>
+
+        <!-- GPS 测速 -->
+        <div class="page" id="page-gps">
+            <div class="sub-content">
+                <h1 class="page-title">GPS测速</h1>
+                <p class="page-desc">基于设备定位实时测速，记录最高速度、平均速度与总里程。<br>
+                    需在 HTTPS 环境下并允许浏览器获取定位权限，完成后点「结束记录」。</p>
+
+                <div class="gps-app">
+                    <div class="gps-warn" id="httpsWarn">非 HTTPS 环境，浏览器会禁用定位</div>
+
+                    <section class="speed-area">
+                        <div class="speed-row">
+                            <div class="speed" id="speedVal">--</div>
+                            <div class="unit">km/h</div>
+                        </div>
+                        <div class="sub" id="coordDec">纬度 -- 经度 --</div>
+                        <div class="sub" id="coordDms">--</div>
+                        <div class="sub row2">
+                            <span id="alt">海拔 -- m</span>
+                            <span id="acc">精度 ±-- m</span>
+                        </div>
+                    </section>
+
+                    <section class="chart-wrap">
+                        <canvas id="chart"></canvas>
+                    </section>
+
+                    <section class="stats">
+                        <div class="stat">
+                            <div class="label">最大速度</div>
+                            <div class="value"><span id="maxSpeed">0.0</span><small>km/h</small></div>
+                        </div>
+                        <div class="stat">
+                            <div class="label">平均速度</div>
+                            <div class="value"><span id="avgSpeed">0.0</span><small>km/h</small></div>
+                        </div>
+                        <div class="stat">
+                            <div class="label">总距离</div>
+                            <div class="value"><span id="distance">0.00</span><small>km</small></div>
+                        </div>
+                        <div class="stat">
+                            <div class="label">已记录时长</div>
+                            <div class="value" id="duration">00:00</div>
+                        </div>
+                        <div class="stat span2">
+                            <div class="label">定位质量</div>
+                            <div class="value" id="quality">—</div>
+                        </div>
+                    </section>
+
+                    <div class="gps-status" id="status"></div>
+
+                    <button type="button" class="main-btn" id="startBtn" disabled>开始记录</button>
+                </div>
+
+                <div class="gps-overlay" id="overlay">
+                    <div class="gps-card">
+                        <h2 id="overlayTitle"></h2>
+                        <div id="overlayBody"></div>
+                        <button type="button" class="retry" id="retryBtn">重新检测</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- 头像弹窗 -->
@@ -571,10 +872,559 @@
         <a href="#" data-target="page-gn">数位屏GN</a>
         <a href="#" data-target="page-travel">游记</a>
         <a href="#" data-target="page-essay">杂谈/随笔</a>
+        <a href="#" data-target="page-gps">GPS测速</a>
     </aside>
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="posts.js"></script>
+    <script>
+    /* ============================================================
+       GPS 测速工具逻辑
+       首次进入「GPS测速」页面时才初始化定位，避免首页一打开就弹权限
+       ============================================================ */
+    (function () {
+      'use strict';
+
+      var $ = function (id) { return document.getElementById(id); };
+
+      var el = {
+        speed: $('speedVal'),
+        coordDec: $('coordDec'),
+        coordDms: $('coordDms'),
+        alt: $('alt'),
+        acc: $('acc'),
+        maxSpeed: $('maxSpeed'),
+        avgSpeed: $('avgSpeed'),
+        distance: $('distance'),
+        duration: $('duration'),
+        quality: $('quality'),
+        status: $('status'),
+        btn: $('startBtn'),
+        httpsWarn: $('httpsWarn'),
+        overlay: $('overlay'),
+        overlayTitle: $('overlayTitle'),
+        overlayBody: $('overlayBody'),
+        retry: $('retryBtn'),
+        canvas: $('chart')
+      };
+
+      var ctx = el.canvas.getContext('2d');
+      var MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, "Courier New", monospace';
+
+      var WINDOW_MS = 60000;    // 曲线时间窗：60 秒
+      var SPEED_WINDOW = 5;     // 速度滑动平均采样点数
+      var ACC_LIMIT = 30;       // 精度阈值（米），超过则不计距离
+      var MIN_MOVE = 3;         // 最小位移（米），低于则不计距离
+      var EARTH_R = 6371000;
+
+      var state = {
+        recording: false,
+        startTime: 0,
+        endTime: 0,
+        maxSpeed: 0,
+        distance: 0,
+        denied: false,
+        unsupported: false
+      };
+
+      var speedBuf = [];
+      var samples = [];
+      var lastFix = null;
+      var distanceAnchor = null;
+      var watchId = null;
+      var wakeLock = null;
+      var cssW = 0, cssH = 0;
+      var started = false;
+
+      /* ================= 工具函数 ================= */
+
+      function haversine(lat1, lon1, lat2, lon2) {
+        var rad = Math.PI / 180;
+        var dLat = (lat2 - lat1) * rad;
+        var dLon = (lon2 - lon1) * rad;
+        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * rad) * Math.cos(lat2 * rad) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        return 2 * EARTH_R * Math.asin(Math.min(1, Math.sqrt(a)));
+      }
+
+      function toDMS(value, isLat) {
+        var hemi = isLat ? (value >= 0 ? 'N' : 'S') : (value >= 0 ? 'E' : 'W');
+        var abs = Math.abs(value);
+        var deg = Math.floor(abs);
+        var minFloat = (abs - deg) * 60;
+        var min = Math.floor(minFloat);
+        var sec = (minFloat - min) * 60;
+        if (sec >= 59.95) { sec = 0; min += 1; }
+        if (min >= 60) { min = 0; deg += 1; }
+        return hemi + ' ' + deg + '°' +
+               String(min).padStart(2, '0') + '′' +
+               sec.toFixed(1).padStart(4, '0') + '″';
+      }
+
+      function fmtDuration(totalSec) {
+        var m = Math.floor(totalSec / 60);
+        var s = totalSec % 60;
+        return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+      }
+
+      function pruneSamples(now) {
+        while (samples.length && samples[0].t < now - WINDOW_MS) {
+          samples.shift();
+        }
+      }
+
+      /* ================= 界面状态 ================= */
+
+      function setBtnEnabled(on) {
+        if (state.denied || state.unsupported) {
+          el.btn.disabled = true;
+          return;
+        }
+        el.btn.disabled = !on;
+      }
+
+      function showSearching() {
+        el.status.textContent = '正在搜索卫星…';
+        el.status.classList.add('show');
+        if (!state.recording) setBtnEnabled(false);
+      }
+
+      function hideSearching() {
+        el.status.textContent = '';
+        el.status.classList.remove('show');
+        if (!state.denied && !state.unsupported) setBtnEnabled(true);
+      }
+
+      function showOverlay(title, lines, isList, showRetry) {
+        el.overlayTitle.textContent = title;
+        if (isList) {
+          el.overlayBody.innerHTML = '<ul>' + lines.map(function (l) {
+            return '<li>' + l + '</li>';
+          }).join('') + '</ul>';
+        } else {
+          el.overlayBody.innerHTML = '<p>' + lines.join('<br>') + '</p>';
+        }
+        el.retry.style.display = showRetry ? 'block' : 'none';
+        el.overlay.classList.add('show');
+      }
+
+      function permissionTips() {
+        var ua = navigator.userAgent;
+        var isIOS = /iPad|iPhone|iPod/.test(ua) ||
+          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        var isAndroid = /Android/.test(ua);
+
+        if (isIOS) {
+          return [
+            '打开「设置」→「隐私与安全性」→「定位服务」，确认定位服务已开启。',
+            '在列表中找到正在使用的浏览器（Safari / Chrome / 微信等），设置为「使用 App 期间」。',
+            '回到浏览器，点地址栏左侧「大小 / aA」→「网站设置」→「位置」，选择「允许」。',
+            '下拉刷新本页面，再点「开始记录」。'
+          ];
+        }
+        if (isAndroid) {
+          return [
+            '点浏览器地址栏左侧的锁形 / 盾牌图标，进入「权限」→「位置信息」，改为「允许」。',
+            '若系统定位关闭：打开手机「设置」→「应用」→ 当前浏览器 →「权限」→ 开启「位置信息」。',
+            '确认手机顶部下拉通知栏里的「定位 / GPS」开关已打开。',
+            '下拉刷新本页面，再点「开始记录」。'
+          ];
+        }
+        return [
+          '点地址栏左侧的锁形图标，把「位置」权限改为「允许」。',
+          '在浏览器设置中清除对本页面的权限拦截记录。',
+          '确认设备的定位服务（GPS）已开启。',
+          '刷新本页面，再点「开始记录」。'
+        ];
+      }
+
+      /* ================= 统计 ================= */
+
+      function updateStats() {
+        var sec = 0;
+        if (state.startTime) {
+          var end = state.recording ? Date.now() : (state.endTime || Date.now());
+          sec = Math.max(0, Math.floor((end - state.startTime) / 1000));
+        }
+        el.duration.textContent = fmtDuration(sec);
+        el.distance.textContent = (state.distance / 1000).toFixed(2);
+        el.maxSpeed.textContent = state.maxSpeed.toFixed(1);
+
+        var avg = 0;
+        if (sec > 0) {
+          avg = (state.distance / 1000) / (sec / 3600);
+        }
+        el.avgSpeed.textContent = avg.toFixed(1);
+      }
+
+      /* ================= 定位回调 ================= */
+
+      function onPosition(pos) {
+        var c = pos.coords;
+        var t = pos.timestamp || Date.now();
+        var lat = c.latitude;
+        var lon = c.longitude;
+        var acc = c.accuracy;
+
+        hideSearching();
+
+        el.coordDec.textContent = '纬度 ' + lat.toFixed(6) + '  经度 ' + lon.toFixed(6);
+        el.coordDms.textContent = toDMS(lat, true) + '   ' + toDMS(lon, false);
+
+        if (typeof c.altitude === 'number' && isFinite(c.altitude)) {
+          el.alt.textContent = '海拔 ' + Math.round(c.altitude) + ' m';
+        } else {
+          el.alt.textContent = '海拔 -- m';
+        }
+        el.acc.textContent = '精度 ±' + Math.round(acc) + ' m';
+        el.acc.classList.remove('mid', 'bad');
+        if (acc > 50) el.acc.classList.add('bad');
+        else if (acc > 30) el.acc.classList.add('mid');
+
+        var q = acc <= 10 ? 'good' : (acc <= 30 ? 'mid' : 'bad');
+        el.quality.textContent = q === 'good' ? '优' : (q === 'mid' ? '良' : '差');
+        el.quality.className = 'value ' + q;
+
+        var raw = null;
+        if (typeof c.speed === 'number' && isFinite(c.speed) && c.speed >= 0) {
+          raw = c.speed * 3.6;
+        } else if (lastFix) {
+          var dt = (t - lastFix.t) / 1000;
+          if (dt >= 0.2) {
+            raw = (haversine(lastFix.lat, lastFix.lon, lat, lon) / dt) * 3.6;
+          }
+        } else {
+          raw = 0;
+        }
+
+        if (raw !== null) {
+          speedBuf.push(raw);
+          if (speedBuf.length > SPEED_WINDOW) speedBuf.shift();
+
+          var sum = 0, i;
+          for (i = 0; i < speedBuf.length; i++) sum += speedBuf[i];
+          var filtered = sum / speedBuf.length;
+
+          el.speed.textContent = filtered.toFixed(1);
+
+          if (state.recording) {
+            if (filtered > state.maxSpeed) state.maxSpeed = filtered;
+
+            var now = Date.now();
+            samples.push({ t: now, v: filtered });
+            pruneSamples(now);
+          }
+        }
+
+        if (state.recording && acc <= ACC_LIMIT) {
+          if (!distanceAnchor) {
+            distanceAnchor = { lat: lat, lon: lon };
+          } else {
+            var d = haversine(distanceAnchor.lat, distanceAnchor.lon, lat, lon);
+            if (d >= MIN_MOVE) {
+              state.distance += d;
+              distanceAnchor = { lat: lat, lon: lon };
+            }
+          }
+        }
+
+        lastFix = { lat: lat, lon: lon, t: t };
+        updateStats();
+      }
+
+      function onError(err) {
+        if (err && err.code === 1) {
+          state.denied = true;
+          el.status.textContent = '';
+          el.status.classList.remove('show');
+          setBtnEnabled(false);
+          if (state.recording) stopRecording();
+          showOverlay('请允许定位权限', permissionTips(), true, true);
+        } else {
+          showSearching();
+        }
+      }
+
+      /* ================= 曲线绘制 ================= */
+
+      function resizeCanvas() {
+        var rect = el.canvas.getBoundingClientRect();
+        cssW = Math.max(1, Math.floor(rect.width));
+        cssH = Math.max(1, Math.floor(rect.height));
+        var dpr = Math.min(window.devicePixelRatio || 1, 2);
+        el.canvas.width = Math.round(cssW * dpr);
+        el.canvas.height = Math.round(cssH * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        drawChart();
+      }
+
+      function drawChart() {
+        if (!cssW || !cssH) return;
+
+        var now = state.recording ? Date.now() : (state.endTime || Date.now());
+        if (state.recording) pruneSamples(now);
+
+        var w = cssW, h = cssH;
+        ctx.clearRect(0, 0, w, h);
+
+        var padL = 30, padR = 10, padT = 12, padB = 16;
+        var pw = Math.max(10, w - padL - padR);
+        var ph = Math.max(10, h - padT - padB);
+
+        var maxV = 0, i;
+        for (i = 0; i < samples.length; i++) {
+          if (samples[i].v > maxV) maxV = samples[i].v;
+        }
+        var top = Math.max(10, Math.ceil((maxV * 1.15) / 10) * 10);
+
+        ctx.lineWidth = 1;
+        ctx.font = '10px ' + MONO;
+
+        for (i = 0; i <= 2; i++) {
+          var y = padT + ph * (i / 2);
+          ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+          ctx.beginPath();
+          ctx.moveTo(padL, y + 0.5);
+          ctx.lineTo(padL + pw, y + 0.5);
+          ctx.stroke();
+
+          ctx.fillStyle = 'rgba(140,152,164,0.85)';
+          ctx.textAlign = 'right';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(String(Math.round(top * (1 - i / 2))), padL - 6, y);
+        }
+
+        var xs = [0, 0.5, 1];
+        var labels = ['-60s', '-30s', '现在'];
+        ctx.textBaseline = 'bottom';
+        for (i = 0; i < xs.length; i++) {
+          var x = padL + pw * xs[i];
+          ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+          ctx.beginPath();
+          ctx.moveTo(x + 0.5, padT);
+          ctx.lineTo(x + 0.5, padT + ph);
+          ctx.stroke();
+
+          ctx.fillStyle = 'rgba(140,152,164,0.8)';
+          ctx.textAlign = i === 0 ? 'left' : (i === xs.length - 1 ? 'right' : 'center');
+          ctx.fillText(labels[i], x, h - 3);
+        }
+
+        var pts = [];
+        for (i = 0; i < samples.length; i++) {
+          var s = samples[i];
+          if (s.t < now - WINDOW_MS) continue;
+          var px = padL + pw * (1 - (now - s.t) / WINDOW_MS);
+          var py = padT + ph * (1 - Math.min(s.v, top) / top);
+          pts.push([px, py]);
+        }
+
+        if (pts.length === 0) {
+          ctx.fillStyle = 'rgba(120,132,144,0.55)';
+          ctx.font = '12px ' + MONO;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(state.startTime ? '暂无速度数据' : '点击「开始记录」开始采集',
+                       padL + pw / 2, padT + ph / 2);
+          return;
+        }
+
+        var grad = ctx.createLinearGradient(0, padT, 0, padT + ph);
+        grad.addColorStop(0, 'rgba(0,229,160,0.30)');
+        grad.addColorStop(1, 'rgba(0,229,160,0.00)');
+
+        ctx.beginPath();
+        ctx.moveTo(pts[0][0], padT + ph);
+        ctx.lineTo(pts[0][0], pts[0][1]);
+        for (i = 1; i < pts.length; i++) {
+          var p0 = pts[i - 1], p1 = pts[i];
+          var mx = (p0[0] + p1[0]) / 2;
+          ctx.bezierCurveTo(mx, p0[1], mx, p1[1], p1[0], p1[1]);
+        }
+        ctx.lineTo(pts[pts.length - 1][0], padT + ph);
+        ctx.closePath();
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(pts[0][0], pts[0][1]);
+        for (i = 1; i < pts.length; i++) {
+          var a0 = pts[i - 1], a1 = pts[i];
+          var amx = (a0[0] + a1[0]) / 2;
+          ctx.bezierCurveTo(amx, a0[1], amx, a1[1], a1[0], a1[1]);
+        }
+        ctx.strokeStyle = '#00e5a0';
+        ctx.lineWidth = 2.5;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.shadowColor = 'rgba(0,229,160,0.55)';
+        ctx.shadowBlur = 8;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        var last = pts[pts.length - 1];
+        ctx.beginPath();
+        ctx.arc(last[0], last[1], 7, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,229,160,0.18)';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(last[0], last[1], 6, 0, Math.PI * 2);
+        ctx.strokeStyle = '#00e5a0';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(last[0], last[1], 3.4, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+      }
+
+      /* ================= 记录控制 ================= */
+
+      function startRecording() {
+        state.recording = true;
+        state.startTime = Date.now();
+        state.endTime = 0;
+        state.maxSpeed = 0;
+        state.distance = 0;
+
+        samples = [];
+        speedBuf = [];
+        distanceAnchor = null;
+
+        el.maxSpeed.textContent = '0.0';
+        el.avgSpeed.textContent = '0.0';
+        el.distance.textContent = '0.00';
+        el.duration.textContent = '00:00';
+
+        el.btn.textContent = '结束记录';
+        el.btn.classList.add('recording');
+
+        requestWakeLock();
+        updateStats();
+        drawChart();
+      }
+
+      function stopRecording() {
+        if (!state.recording) return;
+        state.recording = false;
+        state.endTime = Date.now();
+
+        el.btn.textContent = '开始记录';
+        el.btn.classList.remove('recording');
+
+        releaseWakeLock();
+        updateStats();
+        drawChart();
+      }
+
+      el.btn.addEventListener('click', function () {
+        if (el.btn.disabled || state.denied || state.unsupported) return;
+        if (state.recording) {
+          stopRecording();
+        } else {
+          startRecording();
+        }
+      });
+
+      /* ================= 屏幕常亮 ================= */
+
+      function requestWakeLock() {
+        if (!('wakeLock' in navigator) || !state.recording) return;
+        navigator.wakeLock.request('screen').then(function (lock) {
+          wakeLock = lock;
+          lock.addEventListener('release', function () {
+            if (wakeLock === lock) wakeLock = null;
+          });
+        }).catch(function () {
+          wakeLock = null;
+        });
+      }
+
+      function releaseWakeLock() {
+        if (wakeLock) {
+          try { wakeLock.release(); } catch (e) {}
+          wakeLock = null;
+        }
+      }
+
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'visible' && state.recording && !wakeLock) {
+          requestWakeLock();
+        }
+      });
+
+      /* ================= 定位启动 / 重试 ================= */
+
+      function startWatch() {
+        if (!navigator.geolocation) {
+          state.unsupported = true;
+          setBtnEnabled(false);
+          el.status.textContent = '';
+          el.status.classList.remove('show');
+          showOverlay(
+            '浏览器不支持定位',
+            ['当前浏览器不支持地理定位（Geolocation）API，无法测速。',
+             '请更换到最新版 Chrome、Safari、Edge 或 Firefox 后重新打开本页面。'],
+            false, false
+          );
+          return;
+        }
+
+        if (watchId !== null) {
+          navigator.geolocation.clearWatch(watchId);
+          watchId = null;
+        }
+        state.denied = false;
+        el.overlay.classList.remove('show');
+        showSearching();
+
+        watchId = navigator.geolocation.watchPosition(onPosition, onError, {
+          enableHighAccuracy: true,
+          maximumAge: 0,
+          timeout: 10000
+        });
+      }
+
+      el.retry.addEventListener('click', startWatch);
+
+      /* ================= 对外接口 ================= */
+
+      function init() {
+        if (started) return;
+        started = true;
+        if (!window.isSecureContext) {
+          el.httpsWarn.style.display = 'block';
+        }
+        startWatch();
+      }
+
+      function refresh() {
+        init();
+        // 页面从隐藏切到显示后，画布尺寸才有效，需要重新测量一次
+        requestAnimationFrame(resizeCanvas);
+      }
+
+      // 画布尺寸变化（窗口缩放 / 横竖屏切换）
+      if (window.ResizeObserver) {
+        new ResizeObserver(function () { resizeCanvas(); }).observe(el.canvas);
+      }
+      window.addEventListener('resize', function () { if (started) resizeCanvas(); });
+      window.addEventListener('orientationchange', function () {
+        setTimeout(function () { if (started) resizeCanvas(); }, 200);
+      });
+
+      setInterval(function () {
+        if (!started) return;
+        if (state.recording) updateStats();
+        drawChart();
+      }, 1000);
+
+      window.GPS = { refresh: refresh };
+    })();
+    </script>
     <script>
         // === 渲染文章列表（数据来自 posts.js） ===
         // content 支持 Markdown：marked.js 加载成功就用 Markdown，离线时降级为纯文本分段
@@ -767,7 +1617,8 @@
             "page-home":"",
             "page-gn":"数位屏GN",
             "page-travel":"游记",
-            "page-essay":"杂谈/随笔"
+            "page-essay":"杂谈/随笔",
+            "page-gps":"GPS测速"
         };
         let currentPageId = 'page-home';
 
@@ -781,6 +1632,8 @@
             goHomeBtn.hidden = targetId === 'page-home';
             closeSide();
             window.scrollTo(0,0);
+            // GPS 页面首次打开时才初始化定位（避免首页弹权限），并重新测量画布
+            if(targetId === 'page-gps' && window.GPS) window.GPS.refresh();
         }
 
         // 首页按钮跳转

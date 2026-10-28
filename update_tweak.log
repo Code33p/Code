@@ -1,0 +1,65 @@
+===== DISABLE Windows Update    2026/10/15 周四 23:06:32.93 =====
+
+=== 1. stop + disable services ===
+
+SERVICE_NAME: wuauserv 
+        TYPE               : 30  WIN32  
+        STATE              : 3  STOP_PENDING 
+                                (NOT_STOPPABLE, NOT_PAUSABLE, IGNORES_SHUTDOWN)
+        WIN32_EXIT_CODE    : 0  (0x0)
+        SERVICE_EXIT_CODE  : 0  (0x0)
+        CHECKPOINT         : 0x2
+        WAIT_HINT          : 0x7530
+[SC] ChangeServiceConfig 成功
+
+SERVICE_NAME: UsoSvc 
+        TYPE               : 30  WIN32  
+        STATE              : 3  STOP_PENDING 
+                                (STOPPABLE, NOT_PAUSABLE, ACCEPTS_PRESHUTDOWN)
+        WIN32_EXIT_CODE    : 0  (0x0)
+        SERVICE_EXIT_CODE  : 0  (0x0)
+        CHECKPOINT         : 0x3
+        WAIT_HINT          : 0x7530
+[SC] ChangeServiceConfig 成功
+
+SERVICE_NAME: WaaSMedicSvc 
+        TYPE               : 30  WIN32  
+        STATE              : 3  STOP_PENDING 
+                                (NOT_STOPPABLE, NOT_PAUSABLE, IGNORES_SHUTDOWN)
+        WIN32_EXIT_CODE    : 0  (0x0)
+        SERVICE_EXIT_CODE  : 0  (0x0)
+        CHECKPOINT         : 0x2
+        WAIT_HINT          : 0x7530
+[SC] ChangeServiceConfig 失败 5:
+
+拒绝访问。
+
+
+SERVICE_NAME: DoSvc 
+        TYPE               : 10  WIN32_OWN_PROCESS  
+        STATE              : 3  STOP_PENDING 
+                                (NOT_STOPPABLE, NOT_PAUSABLE, IGNORES_SHUTDOWN)
+        WIN32_EXIT_CODE    : 0  (0x0)
+        SERVICE_EXIT_CODE  : 0  (0x0)
+        CHECKPOINT         : 0x1
+        WAIT_HINT          : 0xea60
+[SC] ChangeServiceConfig2 (delayed autostart flag) 失败 5:
+
+拒绝访问。
+
+操作成功完成。
+
+=== 2. Windows Update policies ===
+操作成功完成。
+操作成功完成。
+操作成功完成。
+操作成功完成。
+
+=== 3. scheduled tasks ===
+错误: 拒绝访问。
+错误: 拒绝访问。
+错误: 拒绝访问。
+错误: 系统中不存在指定的任务名 "\Microsoft\Windows\UpdateOrchestrator\Reboot_AC"。
+错误: 系统中不存在指定的任务名 "\Microsoft\Windows\UpdateOrchestrator\Reboot_Battery"。
+成功: 更改了计划任务 "\Microsoft\Windows\WindowsUpdate\Scheduled Start" 的参数。
+错误: 系统中不存在指定的任务名 "\Microsoft\Windows\WindowsUpdate\Automatic App Update"。
