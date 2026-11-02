@@ -3,12 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CodE33p 个人主页</title>
-    <meta name="description" content="CodE33p 的个人博客 - 数位屏GN、游记、杂谈随笔">
+    <title>CodE33p 个人主页 | 数位屏GN、游记与杂谈</title>
+    <meta name="description" content="CodE33p 的个人博客：数位屏GN 主观评测、旅行游记、杂谈随笔，附带一个 GPS 测速小工具。">
+    <meta name="author" content="Code33">
+    <meta name="theme-color" content="#0b0b0c">
+    <link rel="canonical" href="https://2.code33.dpdns.org/">
     <meta property="og:title" content="CodE33p 个人主页">
     <meta property="og:description" content="数位屏GN、游记、杂谈随笔">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="pic/a.jpg">
+    <meta property="og:url" content="https://2.code33.dpdns.org/">
+    <meta property="og:site_name" content="CodE33p 个人主页">
+    <meta property="og:image" content="https://2.code33.dpdns.org/pic/a.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://2.code33.dpdns.org/pic/a.jpg">
     <link rel="icon" href="pic/a.jpg">
     <style>
         * {
@@ -256,6 +263,7 @@
         /* 折叠时隐藏图片/视频/代码块，避免撑破 3 行预览 */
         .post:not(.expanded) .post-body img,
         .post:not(.expanded) .post-body video,
+        .post:not(.expanded) .post-body .post-figure,
         .post:not(.expanded) .post-body pre {
             display: none;
         }
@@ -280,17 +288,28 @@
         .post.expanded .post-body > *:last-child {
             margin-bottom: 0;
         }
-        .post.expanded .post-body h2 {
-            font-size: 19px;
-            margin: 18px 0 10px;
+        /* 正文内的小标题：白字 + 黑色细描边，与文章标题风格统一 */
+        .post-body h1,
+        .post-body h2,
+        .post-body h3 {
             color: #fff;
+            line-height: 1.5;
+            -webkit-text-stroke: 0.4px rgba(0,0,0,0.6);
+            text-shadow:
+                -0.5px 0 0 rgba(0,0,0,0.55),
+                 0.5px 0 0 rgba(0,0,0,0.55),
+                0 -0.5px 0 rgba(0,0,0,0.55),
+                0  0.5px 0 rgba(0,0,0,0.55);
         }
-        .post.expanded .post-body h2:first-child { margin-top: 0; }
-        .post.expanded .post-body h3 {
-            font-size: 16px;
-            margin: 14px 0 8px;
-            color: #fff;
-        }
+        .post-body h1 { font-size: 22px; }
+        .post-body h2 { font-size: 19px; }
+        .post-body h3 { font-size: 16px; }
+        .post.expanded .post-body h1 { margin: 20px 0 12px; }
+        .post.expanded .post-body h1:first-child,
+        .post.expanded .post-body h2:first-child,
+        .post.expanded .post-body h3:first-child { margin-top: 0; }
+        .post.expanded .post-body h2 { margin: 18px 0 10px; }
+        .post.expanded .post-body h3 { margin: 14px 0 8px; }
         .post.expanded .post-body ul,
         .post.expanded .post-body ol {
             margin: 0 0 12px;
@@ -307,6 +326,7 @@
             border-radius: 4px;
             font-family: ui-monospace, "SF Mono", Menlo, monospace;
             font-size: 13px;
+            text-shadow: none;  /* 代码不继承正文描边，避免小字发糊 */
         }
         .post.expanded .post-body pre {
             background: rgba(0,0,0,0.35);
@@ -316,6 +336,7 @@
             word-break: break-word;
             overflow-wrap: anywhere;
             margin: 0 0 12px;
+            text-shadow: none;  /* 代码块不继承正文描边 */
         }
         .post.expanded .post-body pre code {
             background: none;
@@ -333,6 +354,8 @@
             text-indent: 0;
             text-align: center;
         }
+        /* 行内图片也不许撑出卡片 */
+        .post-body img { max-width: 100%; height: auto; }
         .post-figure img {
             width: 100%;
             height: auto;
@@ -709,6 +732,8 @@
         }
 
         @media (max-width: 768px) {
+            /* 手机上固定背景会拖慢滚动，改成随页面滚动 */
+            body { background-attachment: scroll; }
             .hero-title { font-size: 32px; }
             .btn-group { gap: 12px; }
             #page-gps .chart-wrap { height: 180px; }
@@ -1454,8 +1479,11 @@
         // 直接转成 <em> 标签，绕开 Markdown 强调符 * 在中文/书名号旁的配对规则
         // （否则会出现 *《A》*与*《B》* 里"与"变斜体、书名号反而不斜的问题）
         function transformBookTitles(text){
+            // 0) 中文引号紧贴 * 时 Markdown 认不出斜体（会残留星号），直接换成 <em>
+            let q = text.replace(/\*(“[^”\n]*”)\*/g, (m, g1) => `<em>${g1}</em>`);
+            q = q.replace(/\*(‘[^’\n]*’)\*/g, (m, g1) => `<em>${g1}</em>`);
             // 1) 已被 * 包裹的：*《...》* → <em>《...》</em>（书名号内部误写的 * 一并清掉）
-            let t = text.replace(/\*(《[^》\n]*》)\*/g, (m, g1) =>
+            let t = q.replace(/\*(《[^》\n]*》)\*/g, (m, g1) =>
                 '<em>' + g1.replace(/\*/g, '') + '</em>'
             );
             // 2) 剩余的《...》统一包 <em>，已包过的跳过
@@ -1465,12 +1493,53 @@
             return t;
         }
 
+        // 属性值里的引号先转义，避免图片说明里带引号时把 HTML 弄坏
+        function escapeAttr(s){
+            return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+                            .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        // 生成带图注的图片块：width 类样式给 figure，height/object-fit 留给 img
+        function buildFigure(src, alt, style){
+            let figStyle = '', imgStyleAttr = '';
+            if(style){
+                const props = style.split(';').map(s=>s.trim()).filter(Boolean);
+                const figProps = [], imgProps = [];
+                props.forEach(p=>{
+                    (/^(height|object-fit)/.test(p) ? imgProps : figProps).push(p);
+                });
+                if(figProps.length) figStyle = ` style="${figProps.join(';')}"`;
+                if(imgProps.length) imgStyleAttr = ` style="${imgProps.join(';')}"`;
+            }
+            const cap = alt.trim() ? `<figcaption>${alt}</figcaption>` : '';
+            return `<figure class="post-figure"${figStyle}>` +
+                   `<img src="${src}" alt="${alt}"${imgStyleAttr ? ' ' + imgStyleAttr : ''}>` +
+                   cap + `</figure>`;
+        }
+
         // 图片尺寸语法（写在 markdown 图片地址后面）：
         //   ![描述](pic/x.jpg)          默认，宽度撑满卡片
         //   ![描述](pic/x.jpg =400)     宽度 400px
         //   ![描述](pic/x.jpg =400x300) 宽 400px 高 300px
         //   ![描述](pic/x.jpg =50%)     宽度占卡片 50%
         function transformImages(text){
+            // 整行只有一张图片：直接生成 <figure>，图注一定显示在图片下方
+            const onlyImg = text.match(
+                /^!\[([^\]]*)\]\(\s*([^)\s]+?)\s*(?:=\s*(\d+(?:\.\d+)?)(%)?(?:x(\d+))?)?\s*\)$/
+            );
+            if(onlyImg){
+                const [, alt, src, num, isPct, h] = onlyImg;
+                let style = '';
+                if(num){
+                    const w = isPct ? num + '%' : num + 'px';
+                    style = h
+                        ? `width:${w};height:${h}px;object-fit:contain;`
+                        : `width:${w};max-width:100%;height:auto;`;
+                }
+                // 结尾补一个换行，保证 <figure> 后面是空行，Markdown 不会把下一段吞进 HTML 块
+                return buildFigure(escapeAttr(src), escapeAttr(alt), style) + '\n';
+            }
+            // 图片夹在文字中间：保持行内，不套 figure（避免 <figure> 嵌进 <p> 的非法结构）
             return text.replace(
                 /!\[([^\]]*)\]\(\s*([^)\s]+?)\s*(?:=\s*(\d+(?:\.\d+)?)(%)?(?:x(\d+))?)?\s*\)/g,
                 (m, alt, src, num, isPct, h) => {
@@ -1479,39 +1548,28 @@
                     const style = h
                         ? `width:${w};height:${h}px;object-fit:contain;`
                         : `width:${w};max-width:100%;height:auto;`;
-                    return `<img src="${src}" alt="${alt}" loading="lazy" style="${style}">`;
+                    return `<img src="${escapeAttr(src)}" alt="${escapeAttr(alt)}" style="${style}">`;
                 }
             );
         }
 
-        // 把所有 <img> 包成 <figure>，[ ] 里的文字作为图片下方注释（figcaption）
+        // 兜底：没带尺寸的独立图片补图注；所有图片补懒加载
         function wrapImagesWithCaption(html){
-            return html
-                .replace(/<img\b[^>]*>/g, imgTag => {
-                    const getAttr = name => {
-                        const m = imgTag.match(new RegExp('\\b' + name + '="([^"]*)"'));
-                        return m ? m[1] : '';
-                    };
-                    const alt = getAttr('alt');
-                    const style = getAttr('style');
-                    // width 类样式放到 figure 上；height/object-fit 留在 img 上
-                    let figStyle = '', imgStyleAttr = '';
-                    if(style){
-                        const props = style.split(';').map(s=>s.trim()).filter(Boolean);
-                        const figProps = [], imgProps = [];
-                        props.forEach(p=>{
-                            (/^(height|object-fit)/.test(p) ? imgProps : figProps).push(p);
-                        });
-                        if(figProps.length) figStyle = ` style="${figProps.join(';')}"`;
-                        if(imgProps.length) imgStyleAttr = ` style="${imgProps.join(';')}"`;
-                    }
-                    let innerImg = imgTag.replace(/\s*style="[^"]*"/, '');
-                    if(imgStyleAttr) innerImg = innerImg.replace(/>$/, imgStyleAttr + '>');
-                    const cap = alt.trim() ? `<figcaption>${alt}</figcaption>` : '';
-                    return `<figure class="post-figure"${figStyle}>${innerImg}${cap}</figure>`;
-                })
-                // 去掉 marked 给独占一行图片套的 <p> 外壳（figure 不能嵌在 p 里）
-                .replace(/<p>\s*(<figure\b[\s\S]*?<\/figure>)\s*<\/p>/g, '$1');
+            let out = html.replace(/<p>\s*(<img\b[^>]*>)\s*<\/p>/g, (m, imgTag) => {
+                const getAttr = name => {
+                    const hit = imgTag.match(new RegExp('\\b' + name + '="([^"]*)"'));
+                    return hit ? hit[1] : '';
+                };
+                return buildFigure(getAttr('src'), getAttr('alt'), getAttr('style'));
+            });
+            out = out.replace(/<img\b[^>]*>/g, imgTag => {
+                let tag = imgTag;
+                if(!/\bloading=/.test(tag)) tag = tag.replace(/<img\b/, '<img loading="lazy"');
+                if(!/\bdecoding=/.test(tag)) tag = tag.replace(/<img\b/, '<img decoding="async"');
+                return tag;
+            });
+            // 去掉 marked 给独占一行图片套的 <p> 外壳（figure 不能嵌在 p 里）
+            return out.replace(/<p>\s*(<figure\b[\s\S]*?<\/figure>)\s*<\/p>/g, '$1');
         }
 
         function renderContent(content){
